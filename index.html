@@ -2,90 +2,90 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>EPhone</title>
     <script src="https://unpkg.com/dexie/dist/dexie.js"></script>
     <style>
         @font-face { font-family: 'bulangni'; src: url('https://files.catbx.moe/yzfk0h.ttf') format('truetype'); font-weight: normal; font-style: normal; font-display: swap; }
-        :root { --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
+        :root { --screen-width: 350px; --screen-height: 650px; --secondary-bg: #ffffff; --border-color: #e0e0e0; --text-primary: #1f1f1f; --text-secondary: #8a8a8a; --accent-color: #007bff; }
         html { height: 100%; overflow: hidden; }
-        body { 
-            height: 100%; 
-            overflow: hidden; 
-            margin: 0; 
-            padding: 0; 
-            font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; 
-            font-weight: normal; 
-            background-color: var(--secondary-bg); 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            box-sizing: border-box; 
-        }
-        #phone-screen { 
-            width: 100vw; 
-            height: 100vh; 
-            background-color: var(--secondary-bg); 
-            position: fixed; /* 使用fixed确保覆盖状态栏 */
-            top: 0; 
-            left: 0; 
-            overflow: hidden; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        .screen { 
-            width: 100%; 
-            height: 100%; 
-            position: absolute; 
-            top: 0; 
-            left: 0; 
-            display: flex; 
-            flex-direction: column; 
-            overflow: hidden; 
-            opacity: 0; 
-            visibility: hidden; 
-            transition: opacity 0.3s, visibility 0.3s; 
-        }
-        .screen.active { 
-            opacity: 1; 
-            visibility: visible; 
-            z-index: 1; 
-        }
-        .header { 
-            position: sticky; 
-            top: 0; 
-            z-index: 15; 
-            flex-shrink: 0; 
-            padding: 3px 20px; /* 减小垂直padding，使头部更紧凑 */
-            padding-top: env(safe-area-inset-top); /* 仅使用安全区域，无负值 */
-            background-color: rgba(247, 247, 247, 0.8); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px); 
-            border-bottom: 1px solid var(--border-color); 
-            display: flex; 
-            justify-content: space-between; 
-            align-items: center; 
-            font-size: 16px; /* 略减小字体，紧凑视觉 */
-            font-weight: 600; 
-            line-height: 1.2; /* 确保文字垂直居中 */
-        }
+
+/* ▼▼▼ 请用下面这【一整块】全新的代码，替换掉所有旧的 body, phone-frame, phone-screen 等样式 ▼▼▼ */
+
+/* 1. 重置 body，使其成为一个干净的画布 */
+body {
+    height: 100%;
+    overflow: hidden;
+    margin: 0;
+    font-family: 'bulangni', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    font-weight: normal;
+    /* 背景色可以根据喜好设定，这里用一个柔和的颜色 */
+    background-color: #f0f2f5; 
+}
+
+/* 2. 让 #phone-screen 成为新的“根”容器，撑满整个浏览器窗口 */
+#phone-screen {
+    width: 100%;
+    height: 100%;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    background-color: #000; /* 保留一个默认的黑色背景 */
+}
+
+/* 3. 【核心】隐藏掉模拟器的状态栏 */
+#status-bar {
+    display: none;
+}
+
+/* 4. 【核心】让所有页面的头部自动适应iPhone的“刘海”安全区 */
+.header, .qzone-header {
+    /* 使用 env(safe-area-inset-top) 自动获取顶部安全距离 */
+    padding-top: calc(15px + env(safe-area-inset-top));
+}
+
+/* 5. 【核心】让聊天输入框和底部导航栏自动适应iPhone底部的“小黑条”安全区 */
+#chat-input-area {
+    padding-bottom: calc(8px + env(safe-area-inset-bottom));
+}
+
+#chat-list-bottom-nav {
+     padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* 6. 修正模态框的 z-index，确保它在最顶层 */
+.modal {
+    z-index: 1000; /* 提高 z-index 以确保它覆盖所有内容 */
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+        #status-bar { position: absolute; top: 0; left: 0; width: 100%; padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; color: white; z-index: 10; font-size: 14px; box-sizing: border-box; pointer-events: none; }
+        #status-bar-time { font-weight: 600; }
+        .battery-container { display: flex; align-items: center; gap: 5px; }
+        .battery-icon { width: 25px; height: 12px; border: 1px solid white; border-radius: 3px; position: relative; padding: 1px; }
+        .battery-icon::after { content: ''; position: absolute; right: -3px; top: 2px; width: 2px; height: 6px; background-color: white; border-radius: 0 1px 1px 0; }
+        .battery-level { height: 100%; background-color: white; border-radius: 1px; transition: width 0.5s ease; }
+        .battery-container.charging .battery-level { background-color: #4cd964; animation: charge-breath 2s infinite; }
+        .battery-container.charging .battery-text { color: #4cd964; }
+        @keyframes charge-breath { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+
+        @keyframes charge-breath { 0%, 100% { opacity: 1; } 50% { opacity: 0.7; } }
+        .screen { width: 100%; height: 100%; position: absolute; top: 0; left: 0; display: flex; flex-direction: column; overflow: hidden; opacity: 0; visibility: hidden; transition: opacity 0.3s, visibility 0.3s; }
+        .screen.active { opacity: 1; visibility: visible; z-index: 1; }
+        .header { position: relative; z-index: 15; flex-shrink: 0; padding: 15px 20px; padding-top: 45px; background-color: rgba(247, 247, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; font-size: 18px; font-weight: 600; }
         .header .header-actions { display: flex; align-items: center; gap: 15px; }
         .header .back-btn, .header .action-btn { font-size: 24px; cursor: pointer; width: 30px; text-align: center; color: var(--accent-color); display: flex; align-items: center; justify-content: center; }
-        .header .action-btn { font-size: 16px; font-weight: 600; }
+
+.header .action-btn {
+    font-size: 16px; /* 专门为“上传”、“+”等文字按钮缩小字号 */
+    font-weight: 600; /* 可以加粗一点让它更清晰 */
+}
+
         .header .action-btn img { height: 26px; }
         .header .save-btn { font-size: 16px; color: var(--accent-color); font-weight: 600; cursor: pointer; }
-        #home-screen { 
-            display: flex; 
-            flex-direction: column; 
-            justify-content: flex-start; 
-            align-items: center; 
-            padding: 20px; 
-            padding-top: calc(20px + env(safe-area-inset-top)); 
-            padding-bottom: 50px; 
-            box-sizing: border-box; 
-            background-size: cover; 
-            background-position: center; 
-        }
+        #home-screen { display: flex; flex-direction: column; justify-content: flex-start; align-items: center; padding: 20px; padding-top: 80px; padding-bottom: 50px; box-sizing: border-box; background-size: cover; background-position: center; }
         #clock-container { text-align: center; color: white; text-shadow: 0 3px 8px rgba(0,0,0,0.4); margin-bottom: 20px; flex-shrink: 0; }
         #main-time { font-size: 80px; font-weight: 200; }
         #main-date { font-size: 18px; font-weight: 500; }
@@ -96,7 +96,7 @@
         .app-icon:active .icon-bg { transform: scale(0.9); }
         .app-icon .icon-bg img { width: 100%; height: 100%; object-fit: cover; }
         .app-icon .label { color: white; }
-        .form-container, .list-container { padding: 20px; overflow-y: auto; flex-grow: 1; display: flex; flex-direction: column; }
+        .form-container, .list-container { padding: 20px; overflow-y: auto; flex-grow: 1; display:flex; flex-direction: column; }
         .form-group { margin-bottom: 20px; }
         .form-group label { display: block; margin-bottom: 8px; font-weight: 500; color: var(--text-secondary); }
         .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 1px solid var(--border-color); border-radius: 8px; font-size: 16px; box-sizing: border-box; }
@@ -107,8 +107,24 @@
         #wallpaper-screen .form-container { align-items: center; }
         #wallpaper-preview { width: 180px; height: 320px; border: 2px dashed var(--border-color); background-color: #f0f2f5; margin-bottom: 20px; background-size: cover; background-position: center; border-radius: 10px; display: flex; justify-content: center; align-items: center; color: var(--text-secondary); }
         #wallpaper-upload-input { display: none; }
-        #world-book-list { flex-grow: 1; overflow-y: auto; background-color: var(--secondary-bg); padding-top: calc(20px + env(safe-area-inset-top)); }
-        #chat-list { flex-grow: 1; background-color: var(--secondary-bg); padding-top: calc(20px + env(safe-area-inset-top)); padding-bottom: 50px; box-sizing: border-box; }
+/* 修改后的 #world-book-list 样式 */
+#world-book-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    background-color: var(--secondary-bg);
+    padding-top: 80px;
+    margin-top: -80px;
+}
+
+/* 修改后的 #chat-list 样式，去掉了 padding 和 margin */
+#chat-list {
+    flex-grow: 1;
+    background-color: var(--secondary-bg);
+    padding-top: 80px; 
+    padding-bottom: 50px; /* 为底部导航栏留出空间 */
+    box-sizing: border-box;
+}
+
         .list-item { display: flex; flex-direction: column; padding: 12px 20px; cursor: pointer; border-bottom: 1px solid var(--border-color); }
         .list-item:hover { background-color: #f5f5f5; }
         .list-item .item-title { font-weight: 500; font-size: 16px; margin-bottom: 5px; }
@@ -121,61 +137,96 @@
         .chat-list-item .name { font-weight: 500; color: var(--text-primary); }
         .chat-list-item .group-tag { font-size: 10px; color: var(--accent-color); background-color: #e7f3ff; padding: 2px 6px; border-radius: 4px; font-weight: bold; flex-shrink: 0; }
         .chat-list-item .last-msg { font-size: 13px; color: var(--text-secondary); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 180px; }
-        #chat-interface-screen { 
-            background-size: cover; 
-            background-position: center; 
-            position: fixed; /* 确保覆盖整个屏幕 */
-            top: 0; 
-            left: 0; 
-            width: 100vw; 
-            height: 100vh; 
-            margin: 0; 
-            padding: 0; 
-            display: flex; 
-            flex-direction: column; 
-        }
-        #chat-messages { 
-            flex-grow: 1; 
-            overflow-y: auto; 
-            padding: 10px; 
-            margin: 0; 
-            display: flex; 
-            flex-direction: column; 
-            gap: 15px; 
-        }
+        #chat-interface-screen { background-size: cover; background-position: center; position: relative; }
+        #selection-cancel-btn, #selection-delete-btn { font-size: 16px; color: var(--accent-color); cursor: pointer; padding: 5px; }
+        #selection-delete-btn { color: #ff3b30; }
+/* ▼▼▼ 用这块代码替换掉你原来的 #chat-messages 样式 ▼▼▼ */
+#chat-messages {
+    flex-grow: 1;
+    overflow-y: auto;
+    overflow-x: hidden; /* 核心修正1: 强制禁止水平滚动/拖动 */
+    padding: 10px 15px; /* 核心修正2: 将左右内边距增加到15px，提供更多呼吸空间 */
+    padding-top: 110px;
+    margin-top: -80px;
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    box-sizing: border-box; /* 确保内边距计算正确 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
         #load-more-btn { text-align: center; padding: 10px; color: var(--accent-color); font-size: 14px; cursor: pointer; background-color: transparent; border: none; width: 100%; }
         #load-more-btn:hover { text-decoration: underline; }
-        .message-wrapper { display: flex; flex-direction: column; max-width: 85%; margin-bottom: 18px; position: relative; }
-        .message-wrapper.user { align-self: flex-end; align-items: flex-end; }
-        .message-wrapper.ai { align-self: flex-start; align-items: flex-start; }
+
         .sender-name { font-size: 11px; color: #666; margin-bottom: 3px; }
         .message-wrapper.ai .sender-name { margin-left: 60px; }
-        .message-bubble { display: flex; align-items: flex-start; gap: 19px; position: relative; width: fit-content; max-width: 100%; }
+
+/* ▼▼▼ 请用下面这整块代码，替换掉所有旧的 message-wrapper 和 message-bubble 相关样式 ▼▼▼ */
+
+/* 消息单元的总容器 */
+.message-wrapper {
+    display: flex; /* 关键：使其成为Flex容器，这样内部的对齐才会生效 */
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 18px;
+    max-width: 85%; /* 核心：限制消息单元最大宽度，确保边缘总有空间 */
+}
+
+/* AI消息单元靠左 */
+.message-wrapper.ai {
+    align-self: flex-start; /* 让整个单元在聊天界面中靠左 */
+    align-items: flex-start; /* 让单元内的元素（如气泡）也靠左 */
+}
+
+/* 用户消息单元靠右 */
+.message-wrapper.user {
+    align-self: flex-end; /* 让整个单元在聊天界面中靠右 */
+    align-items: flex-end; /* 让单元内的元素（如气泡）也靠右 */
+}
+
+/* 气泡和头像的直接容器 */
+.message-bubble {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px; /* 确保头像和气泡之间有舒适的间距 */
+    max-width: 100%; /* 气泡宽度不能超过其父容器(message-wrapper) */
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
         .message-bubble.selected::after { content: '✔'; position: absolute; left: -10px; top: 50%; transform: translateY(-50%); background-color: var(--accent-color); color: white; width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 12px; }
         .message-bubble.user.selected::after { left: auto; right: -10px; }
-        .avatar-group { display: flex; flex-direction: column; align-items: center; gap: 5px; flex-shrink: 0; width: 35px; margin-top: -10px; }
-        .message-bubble .avatar { width: 34px; height: 34px; border-radius: 20%; object-fit: cover; }
-        .message-bubble.ai + .timestamp { position: absolute; bottom: -18px; right: 5px; font-size: 11px; color: #888; text-shadow: 0 0 3px rgba(255,255,255,0.6); }
-        .message-bubble.user + .timestamp { position: absolute; bottom: -18px; left: 5px; font-size: 11px; color: #888; text-shadow: 0 0 3px rgba(255,255,255,0.6); }
+
+/* ▼▼▼ 用下面这两条新规则，完整替换掉上面那一条 ▼▼▼ */
+
+/* 默认时间戳样式 (用于对方/AI) */
+.message-bubble.ai + .timestamp {
+    position: absolute;
+    bottom: -18px;
+    right: 5px; /* 定位在右边 */
+    font-size: 11px;
+    color: #888;
+    text-shadow: 0 0 3px rgba(255,255,255,0.6);
+}
+
+/* 用户的时间戳样式 */
+.message-bubble.user + .timestamp {
+    position: absolute;
+    bottom: -18px;
+    left: 5px; /* 关键：定位在左边 */
+    font-size: 11px;
+    color: #888;
+    text-shadow: 0 0 3px rgba(255,255,255,0.6);
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
         .message-bubble.user { flex-direction: row-reverse; }
-        .message-bubble .content { position: relative; font-size: var(--chat-font-size, 16px); padding: 8px 12px; line-height: 1.5; }
         #typing-indicator { align-self: flex-start; display: none; margin: 0 10px 10px; color: var(--text-secondary); }
-        #chat-input-area { 
-            flex-shrink: 0; 
-            padding: 8px; 
-            padding-bottom: calc(8px + env(safe-area-inset-bottom)); 
-            background-color: rgba(247, 247, 247, 0.8); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px); 
-            border-top: 1px solid var(--border-color); 
-            display: flex; 
-            flex-direction: column; 
-            gap: 5px; 
-        }
+        #chat-input-area { flex-shrink: 0; padding: 8px; background-color: rgba(247, 247, 247, 0.8); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-top: 1px solid var(--border-color); display: flex; flex-direction: column; gap: 5px; }
         #chat-input-main-row { display: flex; align-items: flex-end; gap: 8px; width: 100%; }
         #chat-input { flex-grow: 1; border: none; padding: 10px 15px; border-radius: 20px; background-color: var(--secondary-bg); font-size: 16px; max-height: 100px; resize: none; }
         .action-button { border: none; color: white; border-radius: 20px; cursor: pointer; font-weight: 600; font-size: 14px; flex-shrink: 0; }
-        #send-btn { background-color: var(--accent-color); height: 40px; padding: 0 15px; }
+        #send-btn { background-color: var(--accent-color); height: 40px; padding: 0 15px;}
         .modal { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 100; }
         .modal.visible { display: flex; }
         .modal-content { width: 90%; max-height: 90%; background-color: white; border-radius: 15px; display: flex; flex-direction: column; }
@@ -196,52 +247,23 @@
         .member-editor { text-align: center; cursor: pointer; }
         .member-editor img { width: 50px; height: 50px; border-radius: 50%; object-fit: cover; background-color: #eee; margin-bottom: 5px; }
         .member-editor .member-name { font-size: 12px; }
-        #notification-bar { 
-            position: absolute; 
-            top: calc(10px + env(safe-area-inset-top)); 
-            left: 50%; 
-            width: 90%; 
-            z-index: 500; 
-            background-color: rgba(250, 250, 250, 0.9); 
-            backdrop-filter: blur(10px); 
-            -webkit-backdrop-filter: blur(10px); 
-            border-radius: 16px; 
-            padding: 10px; 
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15); 
-            display: flex; 
-            align-items: center; 
-            gap: 12px; 
-            cursor: pointer; 
-            transform: translateX(-50%) translateY(-150%); 
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1); 
-            visibility: hidden; 
-        }
-        #notification-bar.visible { transform: translateX(-50%) translateY(0); visibility: visible; }
+        #notification-bar { position: absolute; top: 40px; left: 50%; width: 90%; z-index: 500; background-color: rgba(250, 250, 250, 0.9); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-radius: 16px; padding: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; gap: 12px; cursor: pointer;     transform: translateX(-50%) translateY(-150%); 
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+    visibility: hidden;
+}
+#notification-bar.visible {
+    /* 关键：在Y轴回到原位的同时，保持X轴的居中变换 */
+    transform: translateX(-50%) translateY(0);
+    visibility: visible;
+}
         #notification-avatar { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; }
         #notification-content .name { font-weight: 600; font-size: 15px; color: #000; }
         #notification-content .message { font-size: 14px; color: #555; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 200px; }
         .sticker-image { max-width: 100px; max-height: 100px; display: block; object-fit: contain; }
         .message-bubble.is-sticker .content, .message-bubble.is-voice-message .content { padding: 0; background-color: transparent; box-shadow: none; border: none; backdrop-filter: none; -webkit-backdrop-filter: none; }
         #chat-input-actions-top { display: flex; gap: 8px; padding: 0 5px; }
-        .chat-action-icon-btn { font-size: 24px; padding: 0; width: 38px; height: 38px; line-height: 38px; text-align: center; border-radius: 50%; background-color: rgba(255, 255, 255, 0.5); color: var(--text-primary); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(0,0,0,0.05); cursor: pointer; display: flex; justify-content: center; align-items: center; }
-        #sticker-panel { 
-            position: absolute; 
-            bottom: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 50%; 
-            background-color: rgba(242, 242, 247, 0.85); 
-            backdrop-filter: blur(15px); 
-            -webkit-backdrop-filter: blur(15px); 
-            border-top: 1px solid var(--border-color); 
-            border-radius: 20px 20px 0 0; 
-            z-index: 200; 
-            display: flex; 
-            flex-direction: column; 
-            transform: translateY(100%); 
-            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
-            visibility: hidden; 
-        }
+        .chat-action-icon-btn { font-size: 24px; padding: 0; width: 38px; height: 38px; line-height: 38px; text-align: center; border-radius: 50%; background-color: rgba(255, 255, 255, 0.5); color: var(--text-primary); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(0,0,0,0.05); cursor: pointer; display:flex; justify-content:center; align-items:center; }
+        #sticker-panel { position: absolute; bottom: 0; left: 0; width: 100%; height: 50%; background-color: rgba(242, 242, 247, 0.85); backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); border-top: 1px solid var(--border-color); border-radius: 20px 20px 0 0; z-index: 200; display: flex; flex-direction: column; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1); visibility: hidden; }
         #sticker-panel.visible { transform: translateY(0); visibility: visible; }
         #sticker-panel-header { padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; flex-shrink: 0; border-bottom: 1px solid var(--border-color); }
         #sticker-panel-header .title { font-weight: 600; }
@@ -250,54 +272,15 @@
         .sticker-item { position: relative; aspect-ratio: 1 / 1; background-color: white; border-radius: 10px; background-size: contain; background-repeat: no-repeat; background-position: center; cursor: pointer; box-shadow: 0 2px 5px rgba(0,0,0,0.1); }
         .sticker-item .delete-btn { display: none; position: absolute; top: -5px; right: -5px; width: 20px; height: 20px; background-color: #ff3b30; color: white; border-radius: 50%; text-align: center; line-height: 20px; font-size: 14px; cursor: pointer; border: 2px solid white; }
         #input-actions-wrapper { position: static; display: flex; align-items: flex-end; gap: 8px; flex-shrink: 0; }
-        #wait-reply-btn { 
-            position: static; 
-            bottom: auto; 
-            right: auto; 
-            width: auto; 
-            height: 40px; 
-            padding: 0 10px; 
-            border-radius: 20px; 
-            display: flex; 
-            align-items: center; 
-            justify-content: center; 
-            background-color: rgba(255, 255, 255, 0); 
-            backdrop-filter: blur(5px); 
-            -webkit-backdrop-filter: blur(5px); 
-            box-shadow: 0 2px 5px rgba(0,0,0,0); 
-            transition: opacity 0.2s, transform 0.1s; 
-            cursor: pointer; 
-        }
+        #wait-reply-btn { position: static; bottom: auto; right: auto; width: auto; height: 40px; padding: 0 10px; border-radius: 20px; display: flex; align-items: center; justify-content: center; background-color: rgba(255, 255, 255, 0.6); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); border: 1px solid rgba(0,0,0,0.08); box-shadow: 0 2px 5px rgba(0,0,0,0.1); transition: opacity 0.2s, transform 0.1s; cursor: pointer;}
         #wait-reply-btn:hover { opacity: 0.8; }
         #wait-reply-btn:active { transform: scale(0.9); }
         #wait-reply-btn img { height: 22px; display: block; margin: auto; }
         .chat-image { max-width: 100%; border-radius: 10px; display: block; }
         .message-bubble.has-image .content { padding: 5px; }
-        #custom-modal-overlay { 
-            position: fixed; 
-            top: 0; 
-            left: 0; 
-            width: 100%; 
-            height: 100%; 
-            background-color: rgba(0,0,0,0.5); 
-            display: none; 
-            align-items: center; 
-            justify-content: center; 
-            z-index: 1000; 
-            opacity: 0; 
-            transition: opacity 0.2s ease-in-out; 
-        }
+        #custom-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.5); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.2s ease-in-out; }
         #custom-modal-overlay.visible { display: flex; opacity: 1; }
-        #custom-modal { 
-            background-color: #fff; 
-            width: 280px; 
-            border-radius: 14px; 
-            box-shadow: 0 4px 20px rgba(0,0,0,0.2); 
-            display: flex; 
-            flex-direction: column; 
-            transform: scale(0.95); 
-            transition: transform 0.2s ease-in-out; 
-        }
+        #custom-modal { background-color: #fff; width: 280px; border-radius: 14px; box-shadow: 0 4px 20px rgba(0,0,0,0.2); display: flex; flex-direction: column; transform: scale(0.95); transition: transform 0.2s ease-in-out; }
         #custom-modal-overlay.visible #custom-modal { transform: scale(1); }
         .custom-modal-header { padding: 16px; font-size: 17px; font-weight: 600; text-align: center; }
         .custom-modal-body { padding: 0 16px 16px; text-align: center; font-size: 14px; color: #333; line-height: 1.5; }
@@ -316,9 +299,36 @@
         .select-box .selected-options-text { flex-grow: 1; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: var(--text-primary); }
         .select-box .arrow-down { margin-left: auto; font-size: 10px; color: var(--text-secondary); transition: transform 0.2s; }
         .select-box.expanded .arrow-down { transform: rotate(180deg); }
-        .checkboxes-container { display: none; position: absolute; top: 100%; margin-top: 5px; left: 0; right: 0; max-height: 150px; overflow-y: auto; background-color: #fff; border: 1px solid var(--border-color); border-radius: 8px; z-index: 101; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+.checkboxes-container {
+    display: none;
+    position: absolute;
+    /* 核心修改：不再使用 top，而是用 margin-top 来创造间距，更稳定 */
+    top: 100%; 
+    margin-top: 5px; /* <-- 新增：向下推开5像素的距离 */
+    left: 0;
+    right: 0;
+    max-height: 150px;
+    overflow-y: auto;
+    background-color: #fff;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    z-index: 101;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+}
+
         .checkboxes-container.visible { display: block; }
-        .checkboxes-container label { display: block; padding: 12px 15px; cursor: pointer; font-weight: normal; color: var(--text-primary); font-size: 15px; }
+        .checkboxes-container label { display: block; padding: 10px 12px; cursor: pointer; font-weight: normal; color: var(--text-primary); }
+
+.checkboxes-container label {
+    display: block;
+    padding: 12px 15px; /* <-- 修改：增加了上下和左右的内边距，让每一行更高更宽 */
+    cursor: pointer;
+    font-weight: normal;
+    color: var(--text-primary);
+    font-size: 15px; /* <-- 新增：将字体大小从默认值放大到15px */
+}
+
         .checkboxes-container input { margin-right: 10px; vertical-align: middle; }
         .bg-upload-container { display: flex; align-items: center; gap: 10px; margin-top: 8px; flex-wrap: wrap; }
         .bg-preview-img { max-width: 120px; max-height: 80px; border-radius: 8px; border: 1px solid var(--border-color); object-fit: cover; display: none; }
@@ -332,16 +342,41 @@
         .voice-waveform { display: flex; align-items: center; height: 20px; gap: 2px; flex-grow: 1; margin: 0 10px; }
         .voice-waveform div { width: 3px; background-color: currentColor; border-radius: 2px; animation: wave-quiet 1.5s ease-in-out infinite; }
         @keyframes wave-quiet { 0%, 100% { height: 2px; } 50% { height: 10px; } }
-        .voice-waveform div:nth-child(2) { animation-delay: 0.2s; }
-        .voice-waveform div:nth-child(3) { animation-delay: 0.4s; }
-        .voice-waveform div:nth-child(4) { animation-delay: 0.6s; }
-        .voice-waveform div:nth-child(5) { animation-delay: 0.8s; }
-        .voice-duration { font-size: var(--chat-font-size, 13px); font-weight: 500; color: var(--text-secondary); }
+        .voice-waveform div:nth-child(2) { animation-delay: 0.2s; } .voice-waveform div:nth-child(3) { animation-delay: 0.4s; } .voice-waveform div:nth-child(4) { animation-delay: 0.6s; } .voice-waveform div:nth-child(5) { animation-delay: 0.8s; }
+.voice-duration {
+    /* --- 核心修正 --- */
+    font-size: var(--chat-font-size, 13px);
+    /* --- 修正结束 --- */
+    font-weight: 500;
+    color: var(--text-secondary);
+}
         .message-bubble.user .voice-duration { color: #3e6224; }
-        /* 气泡主题样式 */
+
+/* ▼▼▼ 用这块代码替换掉你原来的 .message-bubble .content 样式 ▼▼▼ */
+/* 通用内容区样式，为时间戳和字体大小做准备 */
+.message-bubble .content {
+    position: relative;
+    font-size: var(--chat-font-size, 16px);
+    padding: 8px 12px;
+    line-height: 1.5;
+    word-break: break-word; /* 核心修正: 强制长单词或URL换行，防止撑破气泡 */
+}
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+        /* === 气泡主题样式 === */
         .message-bubble.user .content { background-color: rgba(255, 255, 255, 0.75); color: #585858; border-radius: 8px 2px 8px 8px; }
         .message-bubble.ai .content { background-color: rgba(255, 255, 255, 0.7); color: #585858; border-radius: 2px 8px 8px 8px; }
-        .message-bubble::after { content: none; }
+      
+.message-bubble::after {
+    content: "";
+    position: absolute;
+    width: 20px;  
+    height: 20px; 
+    background-size: contain;
+    background-repeat: no-repeat;
+    opacity: 1; 
+    z-index: 1;
+}
       
         #chat-messages[data-theme="pink_blue"] .message-bubble.user .content { background-color: #fff0f6; color: #432531; }
         #chat-messages[data-theme="pink_blue"] .message-bubble.ai .content { background-color: #eff7ff; color: #263a4e; }
@@ -441,37 +476,6 @@
         #battery-alert-image { max-width: 100px; max-height: 100px; margin-bottom: 15px; }
         #battery-alert-text { font-size: 16px; font-weight: 500; color: #333; margin: 0; line-height: 1.4; }
 
-/* ▼▼▼ 然后，将【基础版本】中正确的 CSS 粘贴到刚才删除的位置 ▼▼▼ */
-
-/* === 头像框相关样式 (这是新添加的) === */
-.avatar-with-frame {
-    position: relative; /* 这是为了让头像框能叠在头像上 */
-    width: 30px;
-    height: 30px;
-    flex-shrink: 0; /* 防止被压缩 */
-}
-
-.avatar-with-frame .avatar-img,
-.avatar-with-frame .avatar-frame {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 150%;
-    height: 150%;
-}
-
-.avatar-with-frame .avatar-img {
-    border-radius: 50%; /* 保持原来的圆角 */
-    object-fit: cover;
-    z-index: 1; /* 头像在下 */
-}
-
-.avatar-with-frame .avatar-frame {
-    z-index: 2; /* 头像框在上 */
-    pointer-events: none; /* 让头像框不影响鼠标点击 */
-}
-/* ▲▲▲ 粘贴区域结束 ▲▲▲ */
-
 /* === 头像框选择模态框样式 (这是新添加的) === */
 .change-frame-btn {
     padding: 6px 10px;
@@ -491,19 +495,6 @@
     padding: 0;
     display: flex;
     flex-direction: column;
-}
-
-.avatar-with-frame .avatar-frame {
-    /* 这是关键！我们让头像框变得更大，然后用负边距把它拉回中心 */
-    position: absolute;
-
-    /* 1. 调整大小 */
-    width: 52px;   /* 新宽度 (34px + 6px) */
-    height: 52px;  /* 新高度 (34px + 6px) */
-
-    /* 2. 调整位置 (为了居中) */
-    top: -7px;     /* 向上移动一半的差值 (6px / 2) */
-    left: -4px;    /* 向左移动一半的差值 (6px / 2) */
 }
       
 .frame-tabs {
@@ -1477,12 +1468,13 @@
 
 /* === 收藏列表样式 (修正后) === */
 #favorites-list {
-    flex-grow: 1; /* 关键：让列表占据所有剩余的垂直空间 */
-    overflow-y: auto; /* 关键：当内容超出时，允许列表自身滚动 */
-    padding: 15px; /* 在列表四周都留出一些空白，更好看 */
+    flex-grow: 1; 
+    overflow-y: auto; 
+    overflow-x: hidden; /* <-- 新增这行，禁止水平滚动 */
+    padding: 15px; 
     display: flex;
     flex-direction: column;
-    gap: 15px; /* 卡片之间的间距 */
+    gap: 15px; 
 }
 
 /* ▲▲▲ 替换结束 ▲▲▲ */
@@ -1943,15 +1935,92 @@
     opacity: 0.9 !important;
 }
 
+/* ▼▼▼ 请用下面这【一整块】全新的自适应代码，替换掉所有旧的头像相关样式 ▼▼▼ */
+
+/* 1. 头像容器的【默认/无框】状态 */
+.avatar-group {
+    width: 34px;      /* 默认宽度，和头像图片一样宽 */
+    flex-shrink: 0;
+    position: relative;
+    transition: width 0.2s ease; /* 添加一个平滑的宽度变化动画 */
+}
+
+/* 2. 当【有框】时，头像容器自动变宽 */
+.avatar-group.has-frame {
+    width: 42px; /* 变得更宽，为更大的头像图片和框留出空间 */
+}
+
+/* 3. 普通头像（无框时）的样式 */
+.message-bubble .avatar {
+    width: 34px;
+    height: 34px;
+    border-radius: 20%;
+    object-fit: cover;
+}
+
+/* 4. 带框头像的容器【默认】大小 */
+.avatar-with-frame {
+    position: relative;
+    width: 34px; /* 默认和普通头像一样大 */
+    height: 34px;
+    margin: 0 auto;
+    transition: all 0.2s ease; /* 为大小变化添加动画 */
+}
+
+/* 5. 当【有框】时，带框头像的容器自动【变大】，解决您说的“图小框大”问题！ */
+.avatar-group.has-frame .avatar-with-frame {
+    width: 42px; /* 图片容器变大 */
+    height: 42px;
+}
+
+/* 6. 头像图片本身，永远撑满它的容器 */
+.avatar-with-frame .avatar-img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    z-index: 1;
+}
+
+/* 7. 头像框，永远基于它的父容器居中 */
+.avatar-with-frame .avatar-frame {
+    position: absolute;
+    width: 52px;
+    height: 52px;
+    top: -9px;   
+    left: -4px;  
+    z-index: 2;
+    pointer-events: none;
+}
+
+/* ▲▲▲ 替换结束 ▲▲▲ */
+
+/* ▼▼▼ 这是新增的样式，用于修正所有头部标题的居中问题 ▼▼▼ */
+.header > span:nth-child(2),
+#chat-header-title {
+    position: absolute;
+    left: 50%;
+    transform: translateX(calc(-50% - 2px)); /* 在-50%的基础上，再向左推2像素 */
+    
+    /* (可选但推荐) 防止长标题与两边按钮重叠 */
+    max-width: 60%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+/* ▲▲▲ 粘贴结束 ▲▲▲ */
+
     </style>
 </head>
 <body>
-    <div id="phone-frame">
-        <div class="notch"></div>
         <div id="phone-screen">
             <div id="status-bar">
                 <span id="status-bar-time">12:00</span>
                 <div id="status-bar-battery" class="battery-container">
+                    <span class="battery-text">--%</span>
                     <div class="battery-icon">
                         <div class="battery-level"></div>
                     </div>
@@ -1963,20 +2032,21 @@
                 <div id="clock-container"><div id="main-time">12:00</div><div id="main-date">星期一, 1月1日</div></div>
                                                 <div id="app-grid">
                     <!-- 第一行：放2个图标 -->
-                    <div class="app-row">
-                        <div class="app-icon" onclick="showScreen('world-book-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/nzLsPVZr/1.jpg" alt="世界书"></div><span class="label">世界书</span></div>
-                        <div class="app-icon" onclick="showScreen('chat-list-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/YSRGRG5T/2.jpg" alt="QQ"></div><span class="label">QQ</span></div>
+                            <div class="app-row">
+                                <div class="app-icon" onclick="showScreen('world-book-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/nzLsPVZr/1.jpg" alt="世界书"></div><span class="label">世界书</span></div>
+                                <div class="app-icon" onclick="showScreen('chat-list-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/YSRGRG5T/2.jpg" alt="QQ"></div><span class="label">QQ</span></div>
+                            </div>
+                            <!-- 第二行：放3个图标 -->
+                            <div class="app-row">
+                                <div class="app-icon" onclick="showScreen('api-settings-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/ZnBWJfWh/3.jpg" alt="API设置"></div><span class="label">API设置</span></div>
+                                <div class="app-icon" onclick="showScreen('wallpaper-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/PxFLsGr4/4.jpg" alt="壁纸"></div><span class="label">壁纸</span></div>
+                                <div class="app-icon" onclick="showScreen('font-settings-screen')">
+                                    <div class="icon-bg"><img src="https://i.postimg.cc/L5cn5zPg/5.jpg" alt="字体"></div>
+                                    <span class="label">字体</span>
+                                </div>
+                            </div>                     </div>
                     </div>
-                    <!-- 第二行：放3个图标 -->
-                    <div class="app-row">
-                        <div class="app-icon" onclick="showScreen('api-settings-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/ZnBWJfWh/3.jpg" alt="API设置"></div><span class="label">API设置</span></div>
-                        <div class="app-icon" onclick="showScreen('wallpaper-screen')"><div class="icon-bg"><img src="https://i.postimg.cc/PxFLsGr4/4.jpg" alt="壁纸"></div><span class="label">壁纸</span></div>
-                        <div class="app-icon" onclick="showScreen('font-settings-screen')">
-                            <div class="icon-bg"><img src="https://i.postimg.cc/L5cn5zPg/5.jpg" alt="字体"></div>
-                            <span class="label">字体</span>
-                        </div>
-                    </div>                     </div>
-            </div>
+                    
 
 
           
@@ -3167,11 +3237,11 @@ function displayFilteredFavorites(items) {
             document.getElementById('switch-to-image-mode').click();
         }
 
-// ▼▼▼ 请用这个【终极安全版】函数，完整替换掉你旧的 exportBackup 函数 ▼▼▼
+// ▼▼▼ 用这个【超级加料版】的函数，完整替换掉旧的 exportBackup ▼▼▼
 async function exportBackup() {
     try {
         const backupData = {
-            version: 1,
+            version: 1, // 为未来可能的格式升级做准备
             timestamp: Date.now()
         };
 
@@ -3179,7 +3249,7 @@ async function exportBackup() {
         const [
             chats, worldBooks, userStickers, apiConfig, globalSettings,
             personaPresets, musicLibrary, qzoneSettings, qzonePosts,
-            qzoneAlbums, qzonePhotos, favorites, qzoneGroups
+            qzoneAlbums, qzonePhotos, favorites
         ] = await Promise.all([
             db.chats.toArray(),
             db.worldBooks.toArray(),
@@ -3192,26 +3262,16 @@ async function exportBackup() {
             db.qzonePosts.toArray(),
             db.qzoneAlbums.toArray(),
             db.qzonePhotos.toArray(),
-            db.favorites.toArray(),
-            db.qzoneGroups.toArray() // <-- 确保 qzoneGroups 也被导出
+            db.favorites.toArray()
         ]);
 
-        // 【核心修正】在这里对每一项数据进行安全检查和赋值
-        // 如果某项数据不存在 (undefined)，就用一个安全的空值代替
-        backupData.chats = chats || [];
-        backupData.worldBooks = worldBooks || [];
-        backupData.userStickers = userStickers || [];
-        backupData.apiConfig = apiConfig || { id: 'main' };
-        backupData.globalSettings = globalSettings || { id: 'main' };
-        backupData.personaPresets = personaPresets || [];
-        backupData.musicLibrary = musicLibrary || { id: 'main' };
-        backupData.qzoneSettings = qzoneSettings || { id: 'main' };
-        backupData.qzonePosts = qzonePosts || [];
-        backupData.qzoneAlbums = qzoneAlbums || [];
-        backupData.qzonePhotos = qzonePhotos || [];
-        backupData.favorites = favorites || [];
-        backupData.qzoneGroups = qzoneGroups || []; // <-- 确保 qzoneGroups 也被安全处理
-
+        // 将所有数据整合到一个对象中
+        Object.assign(backupData, {
+            chats, worldBooks, userStickers, apiConfig, globalSettings,
+            personaPresets, musicLibrary, qzoneSettings, qzonePosts,
+            qzoneAlbums, qzonePhotos, favorites
+        });
+        
         // 创建并下载备份文件
         const blob = new Blob(
             [JSON.stringify(backupData, null, 2)], 
@@ -3380,7 +3440,8 @@ state.globalSettings = globalSettings || { id: 'main', wallpaper: 'linear-gradie
 
         function showNotification(chatId, messageContent) { clearTimeout(notificationTimeout); const chat = state.chats[chatId]; if (!chat) return; const bar = document.getElementById('notification-bar'); document.getElementById('notification-avatar').src = chat.settings.aiAvatar || chat.settings.groupAvatar || defaultAvatar; document.getElementById('notification-content').querySelector('.name').textContent = chat.name; document.getElementById('notification-content').querySelector('.message').textContent = messageContent; const newBar = bar.cloneNode(true); bar.parentNode.replaceChild(newBar, bar); newBar.addEventListener('click', () => { openChat(chatId); newBar.classList.remove('visible'); }); newBar.classList.add('visible'); notificationTimeout = setTimeout(() => { newBar.classList.remove('visible'); }, 4000); }
 
-        function updateClock() { const now = new Date(); const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); const dateString = now.toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' }); document.getElementById('main-time').textContent = timeString; document.getElementById('status-bar-time').textContent = timeString; document.getElementById('main-date').textContent = dateString; }
+        function updateClock() { const now = new Date(); const timeString = now.toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' }); const dateString = now.toLocaleDateString('zh-CN', { weekday: 'long', month: 'long', day: 'numeric' }); document.getElementById('main-time').textContent = timeString; document.getElementById('status-bar-time').textContent = timeString; 
+document.getElementById('main-date').textContent = dateString; }
 
         function parseAiResponse(content) {
             const trimmedContent = content.trim();
@@ -3607,7 +3668,7 @@ function renderChatInterface(chatId) {
 
         function renderStickerPanel() { const grid = document.getElementById('sticker-grid'); grid.innerHTML = ''; if (state.userStickers.length === 0) { grid.innerHTML = '<p style="text-align:center; color: var(--text-secondary); grid-column: 1 / -1;">大人请点击右上角“添加”或“上传”来添加你的第一个表情吧！</p>'; return; } state.userStickers.forEach(sticker => { const item = document.createElement('div'); item.className = 'sticker-item'; item.style.backgroundImage = `url(${sticker.url})`; item.title = sticker.name; item.addEventListener('click', () => sendSticker(sticker)); addLongPressListener(item, () => { if (isSelectionMode) return; const existingDeleteBtn = item.querySelector('.delete-btn'); if (existingDeleteBtn) return; const deleteBtn = document.createElement('div'); deleteBtn.className = 'delete-btn'; deleteBtn.innerHTML = '&times;'; deleteBtn.onclick = async (e) => { e.stopPropagation(); const confirmed = await showCustomConfirm('删除表情', `确定要删除表情 "${sticker.name}" 吗？`, { confirmButtonClass: 'btn-danger' }); if (confirmed) { await db.userStickers.delete(sticker.id); state.userStickers = state.userStickers.filter(s => s.id !== sticker.id); renderStickerPanel(); } }; item.appendChild(deleteBtn); deleteBtn.style.display = 'block'; setTimeout(() => item.addEventListener('mouseleave', () => deleteBtn.remove(), { once: true }), 3000); }); grid.appendChild(item); }); }
 
-/* ▼▼▼ 用这个【最终完美对称版】函数替换你现有的 createMessageElement 函数 ▼▼▼ */
+/* ▼▼▼ 请用这个【全新的、带智能判断的】函数，完整替换旧的 createMessageElement ▼▼▼ */
 function createMessageElement(msg, chat) {
     if (msg.isHidden) {
         return null;
@@ -3621,19 +3682,16 @@ function createMessageElement(msg, chat) {
         senderNameDiv.textContent = msg.senderName || '未知成员';
         wrapper.appendChild(senderNameDiv);
     }
-    
-    // 创建气泡元素
+
     const bubble = document.createElement('div');
     bubble.className = `message-bubble ${isUser ? 'user' : 'ai'}`;
     bubble.dataset.timestamp = msg.timestamp;
 
-    // 创建时间戳元素
     const timestampEl = document.createElement('span');
     timestampEl.className = 'timestamp';
     timestampEl.textContent = formatTimestamp(msg.timestamp);
 
-    let avatarSrc;
-    let avatarFrameSrc = '';
+    let avatarSrc, avatarFrameSrc = '';
     if (chat.isGroup) {
         if (isUser) {
             avatarSrc = chat.settings.myAvatar || defaultMyGroupAvatar;
@@ -3653,8 +3711,14 @@ function createMessageElement(msg, chat) {
         }
     }
 
+    // --- 核心修改从这里开始 ---
+
+    // 1. 判断是否有头像框，并生成一个CSS类名
+    const hasFrameClass = avatarFrameSrc ? 'has-frame' : '';
+
     let avatarHtml;
     if (avatarFrameSrc) {
+        // 如果有框，就渲染带框的结构
         avatarHtml = `
             <div class="avatar-with-frame">
                 <img src="${avatarSrc}" class="avatar-img">
@@ -3662,11 +3726,17 @@ function createMessageElement(msg, chat) {
             </div>
         `;
     } else {
+        // 如果没框，就渲染普通的图片
         avatarHtml = `<img src="${avatarSrc}" class="avatar">`;
     }
 
+    // 2. 将 hasFrameClass 添加到 avatar-group 的 class 列表中
+    const avatarGroupHtml = `<div class="avatar-group ${hasFrameClass}">${avatarHtml}</div>`;
+
+    // --- 核心修改结束 ---
+
+
     let contentHtml;
-    // 这部分 contentHtml 的逻辑完全不用动
     if (msg.type === 'user_photo' || msg.type === 'ai_image') {
         bubble.classList.add('is-ai-image');
         const altText = msg.type === 'user_photo' ? "用户描述的照片" : "AI生成的图片";
@@ -3692,23 +3762,21 @@ function createMessageElement(msg, chat) {
     } else {
         contentHtml = String(msg.content || '').replace(/\n/g, '<br>');
     }
-    
-    // 【核心修改】将气泡内部的 HTML 结构简化
+
     bubble.innerHTML = `
-        <div class="avatar-group">${avatarHtml}</div>
+        ${avatarGroupHtml}
         <div class="content">${contentHtml}</div>
     `;
 
-    // 【核心修改】将气泡和时间戳【作为兄弟】依次添加到父容器中
     wrapper.appendChild(bubble);
     wrapper.appendChild(timestampEl);
 
-    addLongPressListener(wrapper, () => showMessageActions(msg.timestamp)); // 把长按事件绑定到 wrapper 上
+    addLongPressListener(wrapper, () => showMessageActions(msg.timestamp));
     bubble.addEventListener('click', () => { if (isSelectionMode) toggleMessageSelection(msg.timestamp); });
 
     return wrapper;
 }
-/* ▲▲▲ 替换区域结束 ▲▲▲ */
+/* ▲▲▲ 替换结束 ▲▲▲ */
 
         function prependMessage(msg, chat) { const messagesContainer = document.getElementById('chat-messages'); const messageEl = createMessageElement(msg, chat); 
 
@@ -4271,7 +4339,7 @@ ${aiVoiceInstructions}
             }
         }
 
-// ▼▼▼ 请将这些新的函数粘贴到 JS 功能函数定义区 ▼▼▼
+// --- ↓↓↓ 从这里开始复制 ↓↓↓ ---
 
 /**
  * 打开图片查看器
@@ -4352,6 +4420,7 @@ function closePhotoViewer() {
     document.getElementById('photo-viewer-image').src = '';
 }
 
+// --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
         // ▼▼▼ 请将这个新函数粘贴到你的JS功能函数定义区 ▼▼▼
         
         /**
@@ -5531,9 +5600,12 @@ document.getElementById('create-post-btn').addEventListener('click', async () =>
     // 2. 设置为“复杂动态”模式
     modal.dataset.mode = 'complex';
     
-    // 3. 确保与图片/文字图相关的部分是可见的
-    modal.querySelector('.post-mode-switcher').style.display = 'flex'; // 用flex恢复
-    modal.querySelector('#image-mode-content').style.display = 'block';
+// 3. 确保与图片/文字图相关的部分是可见的
+modal.querySelector('.post-mode-switcher').style.display = 'flex';
+// 显式激活“上传图片”模式...
+modal.querySelector('#image-mode-content').classList.add('active');
+// ...同时确保“文字图”模式是隐藏的
+modal.querySelector('#text-image-mode-content').classList.remove('active');
     
     // 4. 恢复主输入框的默认提示语
     modal.querySelector('#post-public-text').placeholder = '分享新鲜事...（非必填的公开文字）';
@@ -5556,7 +5628,113 @@ document.getElementById('create-post-btn').addEventListener('click', async () =>
 });
             document.getElementById('open-album-btn').addEventListener('click', async () => { await renderAlbumList(); showScreen('album-screen'); });
             document.getElementById('album-back-btn').addEventListener('click', () => { showScreen('chat-list-screen'); switchToChatListView('qzone-screen'); });
-            document.getElementById('create-album-btn-page').addEventListener('click', async () => { const albumName = await showCustomPrompt("创建新相册", "请输入相册名称"); if (albumName && albumName.trim()) { const newAlbum = { name: albumName.trim(), coverUrl: 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png', photoCount: 0, createdAt: Date.now() }; await db.qzoneAlbums.add(newAlbum); await renderAlbumList(); alert(`相册 "${albumName}" 创建成功！`); } else if (albumName !== null) { alert("相册名称不能为空！"); } });
+
+// --- ↓↓↓ 从这里开始复制 ↓↓↓ ---
+
+document.getElementById('album-photos-back-btn').addEventListener('click', () => {
+    state.activeAlbumId = null;
+    showScreen('album-screen');
+});
+
+document.getElementById('album-upload-photo-btn').addEventListener('click', () => document.getElementById('album-photo-input').click());
+
+document.getElementById('album-photo-input').addEventListener('change', async (event) => {
+    if (!state.activeAlbumId) return;
+    const files = event.target.files;
+    if (!files.length) return;
+
+    const album = await db.qzoneAlbums.get(state.activeAlbumId);
+    
+    for (const file of files) {
+        const dataUrl = await new Promise(resolve => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result);
+            reader.readAsDataURL(file);
+        });
+        await db.qzonePhotos.add({ albumId: state.activeAlbumId, url: dataUrl, createdAt: Date.now() });
+    }
+
+    const photoCount = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).count();
+    const updateData = { photoCount };
+    
+    if (!album.photoCount || album.coverUrl.includes('placeholder')) {
+        const firstPhoto = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).first();
+        if(firstPhoto) updateData.coverUrl = firstPhoto.url;
+    }
+
+    await db.qzoneAlbums.update(state.activeAlbumId, updateData);
+    await renderAlbumPhotosScreen();
+    await renderAlbumList();
+    
+    event.target.value = null;
+    alert('照片上传成功！');
+});
+
+// --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
+
+// --- ↓↓↓ 从这里开始复制，完整替换掉旧的 photos-grid-page 监听器 ↓↓↓ ---
+
+document.getElementById('photos-grid-page').addEventListener('click', async (e) => {
+    const deleteBtn = e.target.closest('.photo-delete-btn');
+    const photoThumb = e.target.closest('.photo-thumb');
+
+    if (deleteBtn) {
+        e.stopPropagation(); // 阻止事件冒泡到图片上
+        const photoId = parseInt(deleteBtn.dataset.photoId);
+        const confirmed = await showCustomConfirm(
+            '删除照片',
+            '确定要删除这张照片吗？此操作不可恢复。',
+            { confirmButtonClass: 'btn-danger' }
+        );
+
+        if (confirmed) {
+            const deletedPhoto = await db.qzonePhotos.get(photoId);
+            if (!deletedPhoto) return;
+            
+            await db.qzonePhotos.delete(photoId);
+
+            const album = await db.qzoneAlbums.get(state.activeAlbumId);
+            const photoCount = (album.photoCount || 1) - 1;
+            const updateData = { photoCount };
+            
+            if (album.coverUrl === deletedPhoto.url) {
+                const nextPhoto = await db.qzonePhotos.where('albumId').equals(state.activeAlbumId).first();
+                updateData.coverUrl = nextPhoto ? nextPhoto.url : 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png';
+            }
+            
+            await db.qzoneAlbums.update(state.activeAlbumId, updateData);
+            await renderAlbumPhotosScreen();
+            await renderAlbumList();
+            alert('照片已删除。');
+        }
+    } 
+    else if (photoThumb) {
+        // 这就是恢复的图片点击放大功能！
+        openPhotoViewer(photoThumb.src);
+    }
+});
+
+// 恢复图片查看器的控制事件
+document.getElementById('photo-viewer-close-btn').addEventListener('click', closePhotoViewer);
+document.getElementById('photo-viewer-next-btn').addEventListener('click', showNextPhoto);
+document.getElementById('photo-viewer-prev-btn').addEventListener('click', showPrevPhoto);
+
+// 恢复键盘左右箭头和ESC键的功能
+document.addEventListener('keydown', (e) => {
+    if (!photoViewerState.isOpen) return; 
+
+    if (e.key === 'ArrowRight') {
+        showNextPhoto();
+    } else if (e.key === 'ArrowLeft') {
+        showPrevPhoto();
+    } else if (e.key === 'Escape') {
+        closePhotoViewer();
+    }
+});
+
+// --- ↑↑↑ 复制到这里结束 ↑↑↑ ---
+         
+document.getElementById('create-album-btn-page').addEventListener('click', async () => { const albumName = await showCustomPrompt("创建新相册", "请输入相册名称"); if (albumName && albumName.trim()) { const newAlbum = { name: albumName.trim(), coverUrl: 'https://i.postimg.cc/pT2xKzPz/album-cover-placeholder.png', photoCount: 0, createdAt: Date.now() }; await db.qzoneAlbums.add(newAlbum); await renderAlbumList(); alert(`相册 "${albumName}" 创建成功！`); } else if (albumName !== null) { alert("相册名称不能为空！"); } });
 
             document.getElementById('cancel-create-post-btn').addEventListener('click', () => document.getElementById('create-post-modal').classList.remove('visible'));
             document.getElementById('post-upload-local-btn').addEventListener('click', () => document.getElementById('post-local-image-input').click());
